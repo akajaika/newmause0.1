@@ -1,6 +1,6 @@
 #include "test.hpp"
 
-void main(){
+void app_main(){
     while (1)
     {
         test();

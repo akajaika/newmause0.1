@@ -11,7 +11,9 @@ uint8_t data_wr[2] = {0x05, 0x55};
 
 void test(){
     ESP_ERROR_CHECK(i2c_master_transmit(PCA9533_handle, data_wr, 2, -1));
-    printf(" IMU: 0x%p\n", recv_data[0]);
+    
+    ESP_ERROR_CHECK(spi_device_polling_transmit(dev_handle, &trans));
+    printf("IMU: 0x%02X\n", recv_data[0]);
 
     gpio_set_level(GPIO_NUM_5, 1);
     gpio_set_level(GPIO_NUM_7, 1);
