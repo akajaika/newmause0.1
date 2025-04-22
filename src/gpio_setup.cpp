@@ -1,3 +1,5 @@
+#include "driver/gpio.h"
+
 void gpio_setup() {
     // 入力ピンの設定
     gpio_set_direction(GPIO_NUM_1, GPIO_MODE_INPUT);

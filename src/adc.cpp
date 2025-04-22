@@ -1,3 +1,6 @@
+#include "esp_adc/adc_continuous.h"
+#define ESP_ERROR_CHECK(x)
+
 adc_continuous_handle_t handle = NULL;
 
 adc_continuous_handle_cfg_t adc_config = {
@@ -5,7 +8,7 @@ adc_continuous_handle_cfg_t adc_config = {
     .conv_frame_size = 256,
 };
 
-adc_digi_pattern_config_t pattern[4] = {
+adc_digi_pattern_config_t pattern[5] = {
     {
         .atten = 11,
         .channel = 0,

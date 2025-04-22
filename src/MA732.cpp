@@ -1,9 +1,10 @@
 #include "driver/spi_master.h"
+#define ESP_ERROR_CHECK(x)
 
 spi_device_interface_config_t dev1_cfg = {
     .clock_speed_hz = 1 * 1000 * 1000, 
     .mode = 0,
-    .spics_io_num = IO10,
+    .spics_io_num = 10,
     .queue_size = 1,
     .flags = 0,
 };
@@ -14,7 +15,7 @@ ESP_ERROR_CHECK(spi_bus_add_device(SPI1_HOST, &dev1_cfg, &dev1_handle));
 spi_device_interface_config_t dev2_cfg = {
     .clock_speed_hz = 1 * 1000 * 1000, 
     .mode = 0,
-    .spics_io_num = IO8,
+    .spics_io_num = 8,
     .queue_size = 1,
     .flags = 0,
 };
