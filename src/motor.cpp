@@ -71,3 +71,6 @@ void setup_moter(){
     mcpwm_generator_set_actions_on_compare_event(gen,gen_cmpr_action,1);
 }
 
+void app_main(){
+    setup_moter();
+}

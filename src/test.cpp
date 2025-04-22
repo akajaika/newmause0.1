@@ -15,6 +15,9 @@ void test(){
     ESP_ERROR_CHECK(spi_device_polling_transmit(dev_handle, &trans));
     printf("IMU: 0x%02X\n", recv_data[0]);
 
+    ESP_ERROR_CHECK(spi_device_polling_transmit(dev1_handle, &trans1));
+    ESP_ERROR_CHECK(spi_device_polling_transmit(dev2_handle, &trans2));
+
     gpio_set_level(GPIO_NUM_5, 1);
     gpio_set_level(GPIO_NUM_7, 1);
     gpio_set_level(GPIO_NUM_9, 1);

@@ -14,3 +14,7 @@ void gpio_setup() {
     gpio_set_direction(GPIO_NUM_14, GPIO_MODE_OUTPUT);
 
 }
+
+void app_main() {
+    gpio_setup();
+}
