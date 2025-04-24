@@ -1,10 +1,15 @@
 #include "driver/mcpwm_timer.h"
 #include "driver/mcpwm_oper.h"
-#include "driver/mcpwm_cmpr.h"
 #include "driver/mcpwm_gen.h"
-#include "driver/mcpwm_prelude.h"
+#include "driver/mcpwm_cmpr.h"
 
-void setup_moter(){
+
+#define MCPWM_GEN_COMPARE_EVENT_ACTION_COUNT 1
+#define GEN_GPIO_NUM 38
+
+#define NUM_TIMER_ACTIONS 1
+
+void setup_motor(){
     //タイマ初期化
     mcpwm_timer_config_t mcpwm_new_timer_cfg = {
         .group_id = 0,
@@ -38,7 +43,7 @@ void setup_moter(){
 
     //ジェネレーター初期化
     mcpwm_generator_config_t mcpwm_new_generator_cfg = {
-        .gen_gpio_num = 38
+        .gen_gpio_num = GEN_GPIO_NUM
     };
     mcpwm_gen_handle_t gen;
     mcpwm_gen_timer_event_action_t gen_timer_action = {
@@ -66,11 +71,10 @@ void setup_moter(){
     mcpwm_comparator_set_compare_value(cmpr,250);
 
     mcpwm_new_generator(oper,&mcpwm_new_generator_cfg,&gen);
-
-    mcpwm_generator_set_actions_on_timer_event(gen,gen_timer_action,1);
-    mcpwm_generator_set_actions_on_compare_event(gen,gen_cmpr_action,1);
+    mcpwm_generator_set_actions_on_timer_event(gen,gen_timer_action,NUM_TIMER_ACTIONS);
+    mcpwm_generator_set_actions_on_compare_event(gen,gen_cmpr_action,MCPWM_GEN_COMPARE_EVENT_ACTION_COUNT);
 }
 
 void app_main(){
-    setup_moter();
+    setup_motor();
 }
