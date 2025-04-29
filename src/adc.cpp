@@ -1,7 +1,7 @@
 #include "esp_adc/adc_continuous.h"
 #define ESP_ERROR_CHECK(x)
 
-void app_main() {
+void setup_adc() {
     adc_continuous_handle_t handle = NULL;
 
     adc_continuous_handle_cfg_t adc_config = {
@@ -51,4 +51,8 @@ void app_main() {
     };
 
     ESP_ERROR_CHECK(adc_continuous_new_handle(&adc_config, &handle));
+}
+
+void app_main() {
+    setup_adc();
 }

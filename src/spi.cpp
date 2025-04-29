@@ -1,7 +1,7 @@
 #include "driver/spi_master.h"
 #define ESP_ERROR_CHECK(x)
 
-void app_main() {
+void setup_spi() {
     spi_bus_config_t spi1_bus_config = {
         .mosi_io_num = 11,
         .miso_io_num = 13,
@@ -21,4 +21,8 @@ void app_main() {
     };
 
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &spi2_bus_config, SPI_DMA_DISABLED));
+}
+
+void app_main() {
+    setup_spi();
 }

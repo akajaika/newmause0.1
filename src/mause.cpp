@@ -113,7 +113,7 @@ void set_wall(int x, int y){
             s_write = NOMALL;
 
             break;
-            
+
         default:
             break;
     }
