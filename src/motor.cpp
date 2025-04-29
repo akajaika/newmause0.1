@@ -11,8 +11,8 @@
 
 #define NUM_TIMER_ACTIONS 1
 
-#define duty_r_ticks 250 // デューティサイクルの初期値 (0-500)
-#define duty_l_ticks 250 // デューティサイクルの初期値 (0-500)
+#define duty_r_ticks 0 // デューティサイクルの初期値 (0-500)
+#define duty_l_ticks 0 // デューティサイクルの初期値 (0-500)
 #define new_duty_r 100 // 新しいデューティサイクル (0-500)
 #define new_duty_l 100 // 新しいデューティサイクル (0-500)
 
