@@ -1,0 +1,1 @@
+void MA732_read(void)

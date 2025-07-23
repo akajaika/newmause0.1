@@ -417,3 +417,8 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/wifi_provisioning/cmake_install.cmake")
 endif()
 
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/main/cmake_install.cmake")
+endif()
+

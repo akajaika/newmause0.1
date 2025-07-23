@@ -1,0 +1,1 @@
+void mot_on(short duty_r, short duty_l);

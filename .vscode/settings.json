@@ -1,5 +1,5 @@
 {
-    "idf.portWin": "COM10",
+    "idf.portWin": "COM14",
     "idf.customExtraVars": {
         "OPENOCD_SCRIPTS": "C:\\Users\\akaja\\.espressif\\tools\\openocd-esp32\\v0.12.0-esp32-20240318/openocd-esp32/share/openocd/scripts",
         "IDF_CCACHE_ENABLE": "1",
@@ -64,5 +64,6 @@
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
-    ]
+    ],
+    "idf.flashType": "JTAG"
 }

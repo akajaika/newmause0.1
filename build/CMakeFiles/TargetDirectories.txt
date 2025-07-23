@@ -646,3 +646,10 @@ C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/wifi_prov
 C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/wifi_provisioning/CMakeFiles/install.dir
 C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/wifi_provisioning/CMakeFiles/install/local.dir
 C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/wifi_provisioning/CMakeFiles/install/strip.dir
+C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/main/CMakeFiles/__idf_main.dir
+C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/main/CMakeFiles/edit_cache.dir
+C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/main/CMakeFiles/rebuild_cache.dir
+C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/main/CMakeFiles/list_install_components.dir
+C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/main/CMakeFiles/install.dir
+C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/main/CMakeFiles/install/local.dir
+C:/Users/akaja/Documents/PlatformIO/Projects/newmause0.1/build/esp-idf/main/CMakeFiles/install/strip.dir
