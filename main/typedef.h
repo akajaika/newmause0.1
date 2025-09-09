@@ -107,10 +107,7 @@ typedef struct
 	unsigned char east:2;	
 	unsigned char south:2;	
 	unsigned char west:2;	
-}t_wall;	
-
-extern bool enc_flag;
-extern bool imu_flag;
+}t_wall;			
 
 
 #define _MYTYPEDEF

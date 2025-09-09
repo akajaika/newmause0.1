@@ -166,13 +166,15 @@ void int_cmt0() {
         // printf("If motors are enabled, apply the duty cycle\n\n");
         // mcpwm_timer_start_stop(m_timer,MCPWM_TIMER_START_NO_STOP);
         // printf("motors are enabled\n\n");
-        update_duty(motor.motor_r.duty, motor.motor_l.duty);
+        ledc_test_pwm(GPIO_NUM_17, motor.motor_l.duty); // 中間デューティ
+		ledc_test_pwm(GPIO_NUM_38, motor.motor_r.duty);
         // printf("motors are doing\n\n");
     } else {
         // printf(" motors are disabled, set duty to 0\n\n");
         motor.motor_r.duty = 0;
         motor.motor_l.duty = 0;
-        update_duty(motor.motor_r.duty, motor.motor_l.duty);
+        ledc_test_pwm(GPIO_NUM_17, motor.motor_l.duty); // 中間デューティ
+		ledc_test_pwm(GPIO_NUM_38, motor.motor_r.duty);
         // if (m_timer == NULL) {
         //     return;
         // }else {
@@ -411,9 +413,7 @@ void int_cmt2(void)
      エンコーダの読み取り：
         値を取得 → 角度更新 → 速度計算
     *****************************************************************************************/    
-        // MA732_read();// エンコーダ角度読み取り
-        enc_flag = true;// Set encoder flag
-
+        MA732_read();// エンコーダ角度読み取り
         enc_data_r = angle2;
         enc_data_l = angle1;
 
@@ -502,8 +502,7 @@ void int_cmt2(void)
     *****************************************************************************************/
     if (state == 1) {
         // ジャイロ値更新
-        // MPU6500_read_accel_gyro();
-        imu_flag = true; // Set IMU flag
+        MPU6500_read_accel_gyro();
 
         // ローパスフィルタ適用前の値取得
         gyro_x_new = imu_ag.gx_f;

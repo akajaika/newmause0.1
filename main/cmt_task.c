@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "MA732_read.h"
 
 TaskHandle_t cmt_task_handle = NULL;
 
@@ -26,17 +25,6 @@ void cmt_task(void *arg) {
         int_cmt1();
         // printf("Doing setup_cmt_timer1_2\n");
         int_cmt2();  // 同上
-
-        if(enc_flag == true) {
-            MA732_read();
-            enc_flag = false;
-        }
-        if (imu_flag == true)
-        {
-            MPU6500_read_accel_gyro();
-            imu_flag = false;
-        }
-        
         vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
