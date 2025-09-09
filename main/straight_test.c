@@ -62,7 +62,6 @@ void straight(float len, float acc, float max_sp, float end_sp){
 			// // printf("accel %f\n", accel);
 			// // printf("max_speed %f\n", max_speed);
 			// printf("%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
-
 		};
 		//減速処理開始
 		accel = -acc;					//減速するために加速度を負の値にする	
@@ -109,6 +108,10 @@ void straight(float len, float acc, float max_sp, float end_sp){
 
 void app_main () {
 	motor.status = false; // Enable motors
+	
+	printf("Before ledc_test_pwm_init\n\n");
+	ledc_test_pwm_init(GPIO_NUM_38, GPIO_NUM_17, 0);
+	vTaskDelay(pdMS_TO_TICKS(1000));
 
 	printf("Before setup_gpio\n\n");
 	gpio_setup();
@@ -216,7 +219,7 @@ void app_main () {
 
 		// vTaskDelay(pdMS_TO_TICKS(1000));
 		// printf("Starting straight test...\n\n");
-		straight(SECTION*6, 0.3, 0.3, 0.0);
+		// straight(SECTION*6, 0.3, 0.3, 0.0);
 		printf("Finished straight test...\n\n");
 	// motor.status = true;
 }

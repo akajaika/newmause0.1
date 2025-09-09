@@ -166,15 +166,13 @@ void int_cmt0() {
         // printf("If motors are enabled, apply the duty cycle\n\n");
         // mcpwm_timer_start_stop(m_timer,MCPWM_TIMER_START_NO_STOP);
         // printf("motors are enabled\n\n");
-        ledc_test_pwm(GPIO_NUM_17, motor.motor_l.duty); // 中間デューティ
-		ledc_test_pwm(GPIO_NUM_38, motor.motor_r.duty);
+        update_duty(motor.motor_r.duty, motor.motor_l.duty);
         // printf("motors are doing\n\n");
     } else {
         // printf(" motors are disabled, set duty to 0\n\n");
         motor.motor_r.duty = 0;
         motor.motor_l.duty = 0;
-        ledc_test_pwm(GPIO_NUM_17, motor.motor_l.duty); // 中間デューティ
-		ledc_test_pwm(GPIO_NUM_38, motor.motor_r.duty);
+        update_duty(motor.motor_r.duty, motor.motor_l.duty);
         // if (m_timer == NULL) {
         //     return;
         // }else {
@@ -189,218 +187,218 @@ void int_cmt0() {
 void int_cmt1(void)
 {
 
-	// gpio_set_level(GPIO_NUM_5, 1);
-	// gpio_set_level(GPIO_NUM_7, 1);
-	// gpio_set_level(GPIO_NUM_9, 1); //LED付いてない
-	// gpio_set_level(GPIO_NUM_14, 1);
+	gpio_set_level(GPIO_NUM_5, 0);
+	gpio_set_level(GPIO_NUM_7, 0);
+	gpio_set_level(GPIO_NUM_9, 0); //LED付いてない
+	gpio_set_level(GPIO_NUM_14, 0);
 
 
-	// // 	switch (as)
-	// // 	{
-	// // 	case 1:
-	// // 		printf("Doing case 1...\n\n");
-	// // 		gpio_set_level(GPIO_NUM_14, 1); // LED消灯
-    // //         gpio_set_level(GPIO_NUM_5, 0);
-	// // 		// ledc_test_pwm2(GPIO_NUM_5, 1); // LED点灯
-	// // 		as = 2; // Increment to next case
-	// // 	    sen_r.d_value = adc_read(1);
-	// // 		break;
+	// 	switch (as)
+	// 	{
+	// 	case 1:
+	// 		printf("Doing case 1...\n\n");
+	// 		gpio_set_level(GPIO_NUM_14, 1); // LED消灯
+    //         gpio_set_level(GPIO_NUM_5, 0);
+	// 		// ledc_test_pwm2(GPIO_NUM_5, 1); // LED点灯
+	// 		as = 2; // Increment to next case
+	// 	    sen_r.d_value = adc_read(1);
+	// 		break;
 
-	// // 	case 2:
-	// // 		printf("Doing case 2...\n\n");
-	// // 		// gpio_set_level(GPIO_NUM_5, 1); // LED消灯
-    // //         gpio_set_level(GPIO_NUM_5, 1);
-	// // 		gpio_set_level(GPIO_NUM_7, 0); // LED点灯	
-    // //         // ledc_test_pwm2(GPIO_NUM_7, 1); 
-	// // 		as = 3; // Increment to next case
-    // //         sen_l.d_value = adc_read(2);
-	// // 		break;
-	// // 	case 3:
-	// // 		printf("Doing case 3...\n\n");
-	// // 		gpio_set_level(GPIO_NUM_7, 1); // LED消灯
-    // //         gpio_set_level(GPIO_NUM_9, 0);
-	// // 		// ledc_test_pwm2(GPIO_NUM_9, 1);  // LED点灯
-	// // 		as = 4; // Increment to next case
-    // //         sen_fr.d_value = adc_read(3);
-	// // 		break;	
+	// 	case 2:
+	// 		printf("Doing case 2...\n\n");
+	// 		// gpio_set_level(GPIO_NUM_5, 1); // LED消灯
+    //         gpio_set_level(GPIO_NUM_5, 1);
+	// 		gpio_set_level(GPIO_NUM_7, 0); // LED点灯	
+    //         // ledc_test_pwm2(GPIO_NUM_7, 1); 
+	// 		as = 3; // Increment to next case
+    //         sen_l.d_value = adc_read(2);
+	// 		break;
+	// 	case 3:
+	// 		printf("Doing case 3...\n\n");
+	// 		gpio_set_level(GPIO_NUM_7, 1); // LED消灯
+    //         gpio_set_level(GPIO_NUM_9, 0);
+	// 		// ledc_test_pwm2(GPIO_NUM_9, 1);  // LED点灯
+	// 		as = 4; // Increment to next case
+    //         sen_fr.d_value = adc_read(3);
+	// 		break;	
 
-	// // 	case 4:
-	// // 		printf("Doing case 4...\n\n");
-	// // 		gpio_set_level(GPIO_NUM_9, 1); // LED消灯
-    // //         // ESP_LOGI(TAG, "CHnum:%4d \n",values[1]);
-    // //         gpio_set_level(GPIO_NUM_14, 0);
-	// // 		// ledc_test_pwm2(GPIO_NUM_14, 1); // LED点灯
-	// // 		as = 1; // Reset to 0 to cycle through cases
-    // //         sen_fr.d_value = adc_read(4);
-	// // 		break;
+	// 	case 4:
+	// 		printf("Doing case 4...\n\n");
+	// 		gpio_set_level(GPIO_NUM_9, 1); // LED消灯
+    //         // ESP_LOGI(TAG, "CHnum:%4d \n",values[1]);
+    //         gpio_set_level(GPIO_NUM_14, 0);
+	// 		// ledc_test_pwm2(GPIO_NUM_14, 1); // LED点灯
+	// 		as = 1; // Reset to 0 to cycle through cases
+    //         sen_fr.d_value = adc_read(4);
+	// 		break;
 		
-	// // 	default:
-	// // 		break;
+	// 	default:
+	// 		break;
             
-	// //     }
+	//     }
 
-    // printf("CH0:%4d CH1:%4d CH2:%4d CH3:%4d\n"
-    //        "CH4:%4d CH5:%4d CH6:%4d CH7:%4d\n",
-    //             values[0], values[1], values[2], values[3] ,
-    //             values[4], values[5], values[6], values[7]);
+    printf("CH0:%4d CH1:%4d CH2:%4d CH3:%4d\n"
+           "CH4:%4d CH5:%4d CH6:%4d CH7:%4d\n",
+                values[0], values[1], values[2], values[3] ,
+                values[4], values[5], values[6], values[7]);
 
-    // static int state = 0;
-    // int i;
+    static int state = 0;
+    int i;
 
-    // switch(state)
+    switch(state)
+	{
+		case 0:		//右センサの読み取り
+
+            // バッファに現在のセンサ値を保存
+			sen_r_history[buffer_index] = sen_r.value;
+
+			// 指定した周期前の値を sen_r_before に保存
+			int past_r_index = (buffer_index + 300 - 120) % 300; // 3周期前の値
+			sen_r_before = sen_r_history[past_r_index];
+			
+			buffer_index = (buffer_index + 1) % 300;
+
+			//バッファ設
+			sen_r.d_value = adc_read(1);			//暗電圧取得
+            values[0] = sen_r.d_value; // Store the value for logging
+            
+            // printf("sen_r.d_value = %d\n", sen_r.d_value);
+			
+			gpio_set_level(GPIO_NUM_5, 0);				//LED点灯
+			for(i = 0; i < WAITLOOP_SLED*10; i++);		//フォトトランジスタ安定化のためのウェイト
+            on_value = adc_read(1); // Read the ADC value for the right sensor
+            values[4] = on_value; // Store the value for logging
+			gpio_set_level(GPIO_NUM_5, 1);				//LED消灯
+	
+			sen_r.value = (on_value - sen_r.d_value);	//センサ値取得
+
+            // ESP_LOGE(TAG, "ADC Read: sen_r, Value: %d", sen_r.value);
+
+			if(sen_r.value > sen_r.th_wall)			//壁判定
+			{
+				sen_r.is_wall = true;			//右壁あり
+			}
+			else
+			{
+				sen_r.is_wall = false;			//右壁なし
+			}
+			
+			if(sen_r.value > sen_r.th_control)		//制御用しきい値を超えたら
+			{
+				sen_r.error = sen_r.value - sen_r.ref;	//偏差計算
+				sen_r.is_control = true;		//制御対象にする
+			}
+			else
+			{
+				sen_r.error = 0;			//制御対象外
+				sen_r.is_control = false;
+			}		
+            state = 3;		//次の状態へ移行	
+			break;
+
+
+		case 1:		//左前センサの読み取り
+
+			//バッファ設定
+			sen_fl.d_value = adc_read(3);			//暗電圧取得
+            values[3] = sen_fl.d_value; // Store the value for logging
+		
+			gpio_set_level(GPIO_NUM_9, 0);					//LED点灯
+			for(i = 0; i < WAITLOOP_SLED*10; i++);		//フォトトランジスタ安定化ウェイト
+            on_value = adc_read(3);
+            values[7] = on_value; // Store the value for logging
+			gpio_set_level(GPIO_NUM_9, 1);					//LED消灯
+
+			sen_fl.value = (on_value - sen_fl.d_value);	//センサ値取得
+
+			if(sen_fl.value > sen_fl.th_wall)		//壁判定
+			{
+				sen_fl.is_wall = true;			//左前壁あり
+			}
+			else
+			{
+				sen_fl.is_wall = false;			//左前壁なし
+			}
+            state = 0;
+			break;
+
+
+		case 2:		//右前センサの読み取り
+		
+			//バッファ設定
+			sen_fr.d_value = adc_read(0);			//暗電圧取得
+            values[2] = sen_fr.d_value; // Store the value for logging
+		
+			gpio_set_level(GPIO_NUM_14, 0);					//LED点灯
+			for(i = 0; i < WAITLOOP_SLED*10; i++);		//フォトトランジスタ安定化
+            on_value = adc_read(0);
+            values[6] = on_value; // Store the value for logging
+			gpio_set_level(GPIO_NUM_14, 1);					//LED消灯
+			
+			sen_fr.value = (on_value - sen_fr.d_value);	//センサ値取得
+
+			if(sen_fr.value > sen_fr.th_wall)		//壁判定
+			{
+				sen_fr.is_wall = true;			//右前壁あり
+			}
+			else
+			{
+				sen_fr.is_wall = false;			//右前壁なし
+			}	
+            state = 1;		
+			break;
+
+
+		case 3:		//左センサの読み取り
+
+			sen_l_history[buffer_index] = sen_l.value;
+			
+			// 指定した周期前の値を sen_r_before に保存
+			int past_l_index = (buffer_index + 300 - 120) % 300; // 3周期前の値
+			sen_l_before = sen_l_history[past_l_index];
+
+			buffer_index = (buffer_index + 1) % 300;
+			
+			//バッファ設定
+			sen_l.d_value = adc_read(2);			//暗電圧取得
+            values[1] = sen_l.d_value; // Store the value for logging
+			
+			gpio_set_level(GPIO_NUM_7, 0);					//LED点灯
+			for(i = 0; i < WAITLOOP_SLED*10; i++)	;	//フォトトランジスタ安定化
+            on_value = adc_read(2);
+            values[5] = on_value; // Store the value for logging
+			gpio_set_level(GPIO_NUM_7, 1);					//LED消灯
+			
+			sen_l.value = (on_value - sen_l.d_value);	//センサ値取得
+			
+			if(sen_l.value > sen_l.th_wall)			//壁判定
+			{
+				sen_l.is_wall = true;			//左壁あり
+			}
+			else
+			{
+				sen_l.is_wall = false;			//左壁なし
+			}
+			
+			if(sen_l.value > sen_l.th_control)		//制御対象か
+			{
+				sen_l.error = sen_l.value - sen_l.ref;	//偏差計算
+				sen_l.is_control = true;		//制御対象にする
+			}
+			else
+			{
+				sen_l.error = 0;			//制御対象外
+				sen_l.is_control = false;
+			}
+            state = 2;
+			break;
+	}
+	
+	// state++;		//4つの状態で切り替え
+	// if(state > 3)
 	// {
-	// 	case 0:		//右センサの読み取り
-
-    //         // バッファに現在のセンサ値を保存
-	// 		sen_r_history[buffer_index] = sen_r.value;
-
-	// 		// 指定した周期前の値を sen_r_before に保存
-	// 		int past_r_index = (buffer_index + 300 - 120) % 300; // 3周期前の値
-	// 		sen_r_before = sen_r_history[past_r_index];
-			
-	// 		buffer_index = (buffer_index + 1) % 300;
-
-	// 		//バッファ設
-	// 		// sen_r.d_value = adc_read(1);			//暗電圧取得
-    //         values[0] = sen_r.d_value; // Store the value for logging
-            
-    //         // printf("sen_r.d_value = %d\n", sen_r.d_value);
-			
-	// 		gpio_set_level(GPIO_NUM_5, 0);				//LED点灯
-	// 		for(i = 0; i < WAITLOOP_SLED*10; i++);		//フォトトランジスタ安定化のためのウェイト
-    //         on_value = adc_read(1); // Read the ADC value for the right sensor
-    //         values[4] = on_value; // Store the value for logging
-	// 		gpio_set_level(GPIO_NUM_5, 1);				//LED消灯
-	
-	// 		sen_r.value = (on_value - sen_r.d_value);	//センサ値取得
-
-    //         // ESP_LOGE(TAG, "ADC Read: sen_r, Value: %d", sen_r.value);
-
-	// 		if(sen_r.value > sen_r.th_wall)			//壁判定
-	// 		{
-	// 			sen_r.is_wall = true;			//右壁あり
-	// 		}
-	// 		else
-	// 		{
-	// 			sen_r.is_wall = false;			//右壁なし
-	// 		}
-			
-	// 		if(sen_r.value > sen_r.th_control)		//制御用しきい値を超えたら
-	// 		{
-	// 			sen_r.error = sen_r.value - sen_r.ref;	//偏差計算
-	// 			sen_r.is_control = true;		//制御対象にする
-	// 		}
-	// 		else
-	// 		{
-	// 			sen_r.error = 0;			//制御対象外
-	// 			sen_r.is_control = false;
-	// 		}		
-    //         state = 3;		//次の状態へ移行	
-	// 		break;
-
-
-	// 	case 1:		//左前センサの読み取り
-
-	// 		//バッファ設定
-	// 		// sen_fl.d_value = adc_read(3);			//暗電圧取得
-    //         values[3] = sen_fl.d_value; // Store the value for logging
-		
-	// 		gpio_set_level(GPIO_NUM_9, 0);					//LED点灯
-	// 		for(i = 0; i < WAITLOOP_SLED*10; i++);		//フォトトランジスタ安定化ウェイト
-    //         on_value = adc_read(3);
-    //         values[7] = on_value; // Store the value for logging
-	// 		gpio_set_level(GPIO_NUM_9, 1);					//LED消灯
-
-	// 		sen_fl.value = (on_value - sen_fl.d_value);	//センサ値取得
-
-	// 		if(sen_fl.value > sen_fl.th_wall)		//壁判定
-	// 		{
-	// 			sen_fl.is_wall = true;			//左前壁あり
-	// 		}
-	// 		else
-	// 		{
-	// 			sen_fl.is_wall = false;			//左前壁なし
-	// 		}
-    //         state = 0;
-	// 		break;
-
-
-	// 	case 2:		//右前センサの読み取り
-		
-	// 		//バッファ設定
-	// 		// sen_fr.d_value = adc_read(0);			//暗電圧取得
-    //         values[2] = sen_fr.d_value; // Store the value for logging
-		
-	// 		gpio_set_level(GPIO_NUM_14, 0);					//LED点灯
-	// 		for(i = 0; i < WAITLOOP_SLED*10; i++);		//フォトトランジスタ安定化
-    //         on_value = adc_read(0);
-    //         values[6] = on_value; // Store the value for logging
-	// 		gpio_set_level(GPIO_NUM_14, 1);					//LED消灯
-			
-	// 		sen_fr.value = (on_value - sen_fr.d_value);	//センサ値取得
-
-	// 		if(sen_fr.value > sen_fr.th_wall)		//壁判定
-	// 		{
-	// 			sen_fr.is_wall = true;			//右前壁あり
-	// 		}
-	// 		else
-	// 		{
-	// 			sen_fr.is_wall = false;			//右前壁なし
-	// 		}	
-    //         state = 1;		
-	// 		break;
-
-
-	// 	case 3:		//左センサの読み取り
-
-	// 		sen_l_history[buffer_index] = sen_l.value;
-			
-	// 		// 指定した周期前の値を sen_r_before に保存
-	// 		int past_l_index = (buffer_index + 300 - 120) % 300; // 3周期前の値
-	// 		sen_l_before = sen_l_history[past_l_index];
-
-	// 		buffer_index = (buffer_index + 1) % 300;
-			
-	// 		//バッファ設定
-	// 		// sen_l.d_value = adc_read(2);			//暗電圧取得
-    //         values[1] = sen_l.d_value; // Store the value for logging
-			
-	// 		gpio_set_level(GPIO_NUM_7, 0);					//LED点灯
-	// 		for(i = 0; i < WAITLOOP_SLED*10; i++)	;	//フォトトランジスタ安定化
-    //         on_value = adc_read(2);
-    //         values[5] = on_value; // Store the value for logging
-	// 		gpio_set_level(GPIO_NUM_7, 1);					//LED消灯
-			
-	// 		sen_l.value = (on_value - sen_l.d_value);	//センサ値取得
-			
-	// 		if(sen_l.value > sen_l.th_wall)			//壁判定
-	// 		{
-	// 			sen_l.is_wall = true;			//左壁あり
-	// 		}
-	// 		else
-	// 		{
-	// 			sen_l.is_wall = false;			//左壁なし
-	// 		}
-			
-	// 		if(sen_l.value > sen_l.th_control)		//制御対象か
-	// 		{
-	// 			sen_l.error = sen_l.value - sen_l.ref;	//偏差計算
-	// 			sen_l.is_control = true;		//制御対象にする
-	// 		}
-	// 		else
-	// 		{
-	// 			sen_l.error = 0;			//制御対象外
-	// 			sen_l.is_control = false;
-	// 		}
-    //         state = 2;
-	// 		break;
+	// 	state = 0;
 	// }
-	
-	// // state++;		//4つの状態で切り替え
-	// // if(state > 3)
-	// // {
-	// // 	state = 0;
-	// // }
 }
 
 void int_cmt2(void)
@@ -413,7 +411,9 @@ void int_cmt2(void)
      エンコーダの読み取り：
         値を取得 → 角度更新 → 速度計算
     *****************************************************************************************/    
-        MA732_read();// エンコーダ角度読み取り
+        // MA732_read();// エンコーダ角度読み取り
+        enc_flag = true;// Set encoder flag
+
         enc_data_r = angle2;
         enc_data_l = angle1;
 
@@ -502,7 +502,8 @@ void int_cmt2(void)
     *****************************************************************************************/
     if (state == 1) {
         // ジャイロ値更新
-        MPU6500_read_accel_gyro();
+        // MPU6500_read_accel_gyro();
+        imu_flag = true; // Set IMU flag
 
         // ローパスフィルタ適用前の値取得
         gyro_x_new = imu_ag.gx_f;

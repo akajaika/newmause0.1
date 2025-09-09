@@ -45,6 +45,8 @@ int16_t ax, ay, az, gx, gy, gz;
 
 float angle1 = 0.0f, angle2 = 0.0f; // MA732 エンコーダ角度（度単位）
 
+bool imu_flag = false;
+bool enc_flag = false;
 
 // -----------------------------------------------------------------------------
 // SPI バス初期化：SPI2_HOST (MPU6500)、SPI3_HOST (MA732×2)
