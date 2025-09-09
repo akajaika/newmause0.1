@@ -109,7 +109,7 @@ void straight(float len, float acc, float max_sp, float end_sp){
 
 void app_main () {
 	motor.status = false; // Enable motors
-	
+
 	printf("Before ledc_test_pwm_init\n\n");
 	ledc_test_pwm_init(GPIO_NUM_38, GPIO_NUM_17, 0);
 	vTaskDelay(pdMS_TO_TICKS(1000));
@@ -220,7 +220,7 @@ void app_main () {
 
 		// vTaskDelay(pdMS_TO_TICKS(1000));
 		// printf("Starting straight test...\n\n");
-		straight(SECTION*6, 0.3, 0.3, 0.0);
+		// straight(SECTION*6, 0.3, 0.3, 0.0);
 		printf("Finished straight test...\n\n");
 	// motor.status = true;
 }
