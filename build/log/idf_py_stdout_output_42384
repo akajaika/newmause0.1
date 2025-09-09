@@ -1,0 +1,8 @@
+esptool.py v4.8.1
+Serial port COM14
+
+A fatal error occurred: Could not open COM14, the port is busy or doesn't exist.
+(could not open port 'COM14': FileNotFoundError(2, 'w肳ꂽt@C܂B', None, 2))
+
+Hint: Check if the port is correct and ESP connected
+
