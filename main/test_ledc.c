@@ -25,7 +25,7 @@ void ledc_test_pwm_init(gpio_num_t pin_r, gpio_num_t pin_l, int duty8) {
         .speed_mode = LEDC_LOW_SPEED_MODE,
         .channel = LEDC_CHANNEL_1,
         .intr_type = LEDC_INTR_DISABLE,
-        .timer_sel = LEDC_TIMER_1,
+        .timer_sel = LEDC_TIMER_0,
         .duty = duty8,
         .hpoint = 0
     };
@@ -56,10 +56,10 @@ void ledc_test_pwm2(gpio_num_t pin, int duty8) {
 }
 
 void update_duty(int duty_r8, int duty_l8) {
-    printf("duty_r8: %d, duty_l8: %d\n", duty_r8, duty_l8);
     ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1, duty_r8);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1);
 
     ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty_l8);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+    printf("duty_r8: %d, duty_l8: %d\n", duty_r8, duty_l8);
 }

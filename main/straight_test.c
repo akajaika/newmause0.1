@@ -51,7 +51,8 @@ void straight(float len, float acc, float max_sp, float end_sp){
 	
 	if(end_speed == 0){	//最終的に停止する場合
 		//減速処理を始めるべき位置まで加速、定速区間を続行
-		while( ((len_target -10) - len_mouse) >  1000.0*((float)(tar_speed * tar_speed) - (float)(end_speed * end_speed))/(float)(2.0*accel)){
+		while( ((len_target -10) - len_mouse) >  1000*((float)(tar_speed * tar_speed) - (float)(end_speed * end_speed))/(float)(2*accel)){
+			vTaskDelay(1);
 			// printf("motors are doing\n\n");
 			// printf("while %f > %f\n", ((len_target -10) - len_mouse), 1000.0*((float)(tar_speed * tar_speed) - (float)(end_speed * end_speed))/(float)(2.0*accel));
 			// // printf("len_target %f\n", len_target);
@@ -61,16 +62,17 @@ void straight(float len, float acc, float max_sp, float end_sp){
 			// // printf("end_speed %f\n", end_speed);
 			// // printf("accel %f\n", accel);
 			// // printf("max_speed %f\n", max_speed);
-			// printf("%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
+			printf("%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
 		};
 		//減速処理開始
 		accel = -acc;					//減速するために加速度を負の値にする	
 		while(len_mouse < len_target -1){		//停止したい距離の少し手前まで継続
+			vTaskDelay(1);
 			// printf("Starting straight test...\n\n");
 			// printf("len_mouse %f\n", len_mouse);
 			// printf("len_target %f\n", len_target);
 			// printf("speed %f\n", speed);
-			// printf("%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
+			printf("%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
 
 			//一定速度まで減速したら最低駆動トルクで走行
 			// if(tar_speed <= MIN_SPEED){	//目標速度が最低速度になったら、加速度を0にする
@@ -87,7 +89,7 @@ void straight(float len, float acc, float max_sp, float end_sp){
 			
 	}else{
 		//減速処理を始めるべき位置まで加速、定速区間を続行
-		while( ((len_target-10) - len_mouse) >  1000.0*((float)(tar_speed * tar_speed) - (float)(end_speed * end_speed))/(float)(2.0*accel));
+		while( ((len_target-10) - len_mouse) >  1000*((float)(tar_speed * tar_speed) - (float)(end_speed * end_speed))/(float)(2*accel));
 		
 		//減速処理開始
 		accel = -acc;					//減速するために加速度を負の値にする	
@@ -108,10 +110,6 @@ void straight(float len, float acc, float max_sp, float end_sp){
 
 void app_main () {
 	motor.status = false; // Enable motors
-	
-	printf("Before ledc_test_pwm_init\n\n");
-	ledc_test_pwm_init(GPIO_NUM_38, GPIO_NUM_17, 0);
-	vTaskDelay(pdMS_TO_TICKS(1000));
 
 	printf("Before setup_gpio\n\n");
 	gpio_setup();
@@ -128,6 +126,10 @@ void app_main () {
     printf("Before init_imu\n\n");
     init_imu();
     vTaskDelay(pdMS_TO_TICKS(1000));
+	
+	printf("Before ledc_test_pwm_init\n\n");
+	ledc_test_pwm_init(GPIO_NUM_38, GPIO_NUM_17, 0);
+	vTaskDelay(pdMS_TO_TICKS(1000));
 
     printf("Before setup_cmt_timer\n\n");
     setup_cmt_timer();
@@ -219,7 +221,7 @@ void app_main () {
 
 		// vTaskDelay(pdMS_TO_TICKS(1000));
 		// printf("Starting straight test...\n\n");
-		// straight(SECTION*6, 0.3, 0.3, 0.0);
+		straight(SECTION, SEARCH_ACCEL, SEARCH_SPEED, 0.0);
 		printf("Finished straight test...\n\n");
 	// motor.status = true;
 }

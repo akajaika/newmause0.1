@@ -111,8 +111,8 @@ void int_cmt0() {
         // printf("Doing3 intrrept r %f\n", V_r);
         // printf("Doing3 intrrept l %f\n", V_l);
         //PID omega
-        // V_r += (tar_ang_vel - ang_vel) * OMEGA_KP;
-        // V_l -= (tar_ang_vel - ang_vel) * OMEGA_KP;
+        V_r += (tar_ang_vel - ang_vel) * OMEGA_KP;
+        V_l -= (tar_ang_vel - ang_vel) * OMEGA_KP;
 
         // V_r += (I_tar_ang_vel - I_ang_vel) * OMEGA_KI;
         // V_l -= (I_tar_ang_vel - I_ang_vel) * OMEGA_KI;
@@ -237,10 +237,10 @@ void int_cmt1(void)
             
 	//     }
 
-    printf("CH0:%4d CH1:%4d CH2:%4d CH3:%4d\n"
-           "CH4:%4d CH5:%4d CH6:%4d CH7:%4d\n",
-                values[0], values[1], values[2], values[3] ,
-                values[4], values[5], values[6], values[7]);
+    // printf("CH0:%4d CH1:%4d CH2:%4d CH3:%4d\n"
+    //        "CH4:%4d CH5:%4d CH6:%4d CH7:%4d\n",
+    //             values[0], values[1], values[2], values[3] ,
+    //             values[4], values[5], values[6], values[7]);
 
     static int state = 0;
     int i;
@@ -486,7 +486,7 @@ void int_cmt2(void)
         // 総移動距離（左右の新速度の平均を足す）
         len_mouse += (speed_new_r + speed_new_l) / 2.0;
 
-        // ESP_LOGE(TAG, "len_mouse: %f", len_mouse);
+        ESP_LOGE(TAG, "len_mouse: %f", len_mouse);
 
         // 次回差分計算用に保持
         before_locate_r = locate_r;
