@@ -52,7 +52,7 @@ void straight(float len, float acc, float max_sp, float end_sp){
 	if(end_speed == 0){	//最終的に停止する場合
 		//減速処理を始めるべき位置まで加速、定速区間を続行
 		while( ((len_target -10) - len_mouse) >  1000*((float)(tar_speed * tar_speed) - (float)(end_speed * end_speed))/(float)(2*accel)){
-			vTaskDelay(1);
+			vTaskDelay(1);	//watchdog対策
 			// printf("motors are doing\n\n");
 			// printf("while %f > %f\n", ((len_target -10) - len_mouse), 1000.0*((float)(tar_speed * tar_speed) - (float)(end_speed * end_speed))/(float)(2.0*accel));
 			// // printf("len_target %f\n", len_target);
@@ -62,17 +62,17 @@ void straight(float len, float acc, float max_sp, float end_sp){
 			// // printf("end_speed %f\n", end_speed);
 			// // printf("accel %f\n", accel);
 			// // printf("max_speed %f\n", max_speed);
-			printf("%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
+			printf("%f, %f, %f, %f, %f, %f\n", tar_speed, speed/10, tar_speed - speed/10, len_mouse, V_r, V_l);
 		};
 		//減速処理開始
 		accel = -acc;					//減速するために加速度を負の値にする	
 		while(len_mouse < len_target -1){		//停止したい距離の少し手前まで継続
-			vTaskDelay(1);
+			vTaskDelay(1);	//watchdog対策
 			// printf("Starting straight test...\n\n");
 			// printf("len_mouse %f\n", len_mouse);
 			// printf("len_target %f\n", len_target);
 			// printf("speed %f\n", speed);
-			printf("%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
+			printf("%f, %f, %f, %f, %f, %f\n", tar_speed, speed/10, tar_speed - speed/10, len_mouse, V_r, V_l);
 
 			//一定速度まで減速したら最低駆動トルクで走行
 			// if(tar_speed <= MIN_SPEED){	//目標速度が最低速度になったら、加速度を0にする
@@ -107,6 +107,96 @@ void straight(float len, float acc, float max_sp, float end_sp){
 	len_mouse = 0;
 }
 
+void turn(int deg, float ang_accel, float max_ang_velocity, short dir){
+	//wait_ms(10);
+	I_tar_ang_vel = 0;
+	I_ang_vel = 0;
+	I_tar_speed = 0;
+	I_speed = 0;
+	tar_degree = 0;
+
+	con_wall.enable = false;
+
+	float	local_degree = 0;
+	accel = 0;
+	tar_speed = 0;
+	tar_ang_vel = 0;
+	//走行モードをスラロームモードにする
+	run_mode = TURN_MODE;
+
+	//回転方向定義
+	TURN_DIR = dir;	
+	
+	//車体の現在角度を取得
+	local_degree = degree;
+	tar_degree = 0;
+	
+	//角加速度、加速度、最高角速度設定
+	motor.status = true; // Enable motors
+	if(dir == LEFT){
+		ang_acc = ang_accel;			//角加速度を設定
+		max_ang_vel = max_ang_velocity;
+		max_degree = deg;
+		while( (max_degree - (degree - local_degree))*PI/180.0 > (tar_ang_vel*tar_ang_vel/(2.0 * ang_acc))){
+			printf("%f, %f, %f, %f, %f, %f\n", tar_ang_vel, ang_vel/10, tar_ang_vel - ang_vel/10, degree, V_r, V_l);
+			vTaskDelay(1);	//watchdog対策
+		};
+		
+	}else if(dir == RIGHT){
+		ang_acc = -ang_accel;			//角加速度を設定
+		max_ang_vel = -max_ang_velocity;
+		max_degree = -deg;
+		while(-(float)(max_degree - (degree - local_degree))*PI/180.0 > (float)(tar_ang_vel*tar_ang_vel/(float)(2.0 * -ang_acc))){
+			printf("%f, %f, %f, %f, %f, %f\n", tar_ang_vel, ang_vel/10, tar_ang_vel - ang_vel/10, degree, V_r, V_l);
+			vTaskDelay(1);	//watchdog対策
+		};
+	}
+
+	//BEEP();
+	//角減速区間に入るため、角加速度設定
+	motor.status = true; // Enable motors
+	if(dir == LEFT){
+		ang_acc = -ang_accel;			//角加速度を設定
+		//減速区間走行
+		while(((degree - local_degree) < max_degree)){
+			printf("%f, %f, %f, %f, %f, %f\n", tar_ang_vel, ang_vel/10, tar_ang_vel - ang_vel/10, degree, V_r, V_l);
+			vTaskDelay(1);	//watchdog対策
+			// if(tar_ang_vel < TURN_MIN_SPEED){
+			// 	ang_acc = 0;
+			// 	tar_ang_vel = TURN_MIN_SPEED;
+			// }
+		}
+		
+		ang_acc = 0;
+		tar_ang_vel = 0;
+		tar_degree = max_degree;
+		
+	}else if(dir == RIGHT){
+		ang_acc = +ang_accel;			//角加速度を設定
+		//減速区間走行
+		while(((degree - local_degree) > max_degree)){
+			printf("%f, %f, %f, %f, %f, %f\n", tar_ang_vel, ang_vel/10, tar_ang_vel - ang_vel/10, degree, V_r, V_l);
+			vTaskDelay(1);	//watchdog対策
+			// if(-tar_ang_vel < TURN_MIN_SPEED){
+			// 	ang_acc = 0;
+			// 	tar_ang_vel = -TURN_MIN_SPEED;
+			// }
+		}
+		ang_acc = 0;
+		tar_ang_vel = 0;
+		tar_degree = max_degree;
+
+	}
+	
+	while(ang_vel >= 0.05 || ang_vel <= -0.05 );
+	
+	tar_ang_vel = 0;
+	ang_acc = 0;
+	//現在距離を0にリセット
+	len_mouse = 0;
+	//wait_ms(10);
+}
+
 
 void app_main () {
 	motor.status = false; // Enable motors
@@ -128,7 +218,7 @@ void app_main () {
     vTaskDelay(pdMS_TO_TICKS(1000));
 	
 	printf("Before ledc_test_pwm_init\n\n");
-	ledc_test_pwm_init(GPIO_NUM_38, GPIO_NUM_17, 0);
+	ledc_test_pwm_init(GPIO_NUM_17, GPIO_NUM_38, 0);
 	vTaskDelay(pdMS_TO_TICKS(1000));
 
     printf("Before setup_cmt_timer\n\n");
@@ -221,7 +311,9 @@ void app_main () {
 
 		// vTaskDelay(pdMS_TO_TICKS(1000));
 		// printf("Starting straight test...\n\n");
-		straight(SECTION, SEARCH_ACCEL, SEARCH_SPEED, 0.0);
+		// straight(SECTION, SEARCH_ACCEL, SEARCH_SPEED, 0.0);
+		// vTaskDelay(pdMS_TO_TICKS(1000));
+		// turn(90,TURN_ACCEL,TURN_SPEED,LEFT);
 		printf("Finished straight test...\n\n");
 	// motor.status = true;
 }

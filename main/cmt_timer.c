@@ -26,7 +26,7 @@ void setup_cmt_timer() {
     timer_init(TIMER_GROUP_0, TIMER_0, &cfg);
 
     // 1 MHz カウント → 1 ms ごとに 1000 カウント
-    timer_set_alarm_value(TIMER_GROUP_0, TIMER_0, 100000);
+    timer_set_alarm_value(TIMER_GROUP_0, TIMER_0, 1000);
     timer_enable_intr(TIMER_GROUP_0, TIMER_0);
     esp_err_t err = timer_isr_register(
         TIMER_GROUP_0, TIMER_0, cmt_isr,

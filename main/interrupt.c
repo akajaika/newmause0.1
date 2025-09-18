@@ -40,9 +40,9 @@ void int_cmt0() {
         // Handle straight mode interrupt
         // Add your specific logic here
         // tar_speed += accel / 1000; 
-        tar_speed += accel / 500;
+        tar_speed += accel / 1000;
         if (tar_speed > max_speed) {
-            ESP_LOGI(TAG, "tar_speed: %f, max_speed: %f", tar_speed, max_speed);
+            // ESP_LOGI(TAG, "tar_speed: %f, max_speed: %f", tar_speed, max_speed);
             tar_speed = max_speed; 
         }
     } else if (run_mode == TURN_MODE) {
@@ -90,11 +90,11 @@ void int_cmt0() {
     
     if (run_mode == STRAIGHT_MODE || run_mode == TURN_MODE) {
         //PID speed
-        // V_r += (tar_speed - speed) * SPEED_KP;
-        // V_l += (tar_speed - speed) * SPEED_KP;
+        V_r += (tar_speed - speed/10) * SPEED_KP;
+        V_l += (tar_speed - speed/10) * SPEED_KP;
         
-        V_r += (tar_speed) * SPEED_KP;
-        V_l += (tar_speed) * SPEED_KP;
+        // V_r += (tar_speed) * SPEED_KP;
+        // V_l += (tar_speed) * SPEED_KP;
 
         // printf("Doing1 intrrept r %f\n", V_r);
         // printf("Doing1 intrrept l %f\n", V_l);
@@ -111,8 +111,10 @@ void int_cmt0() {
         // printf("Doing3 intrrept r %f\n", V_r);
         // printf("Doing3 intrrept l %f\n", V_l);
         //PID omega
-        V_r += (tar_ang_vel - ang_vel) * OMEGA_KP;
-        V_l -= (tar_ang_vel - ang_vel) * OMEGA_KP;
+        // V_r += (tar_ang_vel - ang_vel) * OMEGA_KP;
+        // V_l -= (tar_ang_vel - ang_vel) * OMEGA_KP;
+        V_r += (tar_ang_vel) * OMEGA_KP;
+        V_l -= (tar_ang_vel) * OMEGA_KP;
 
         // V_r += (I_tar_ang_vel - I_ang_vel) * OMEGA_KI;
         // V_l -= (I_tar_ang_vel - I_ang_vel) * OMEGA_KI;
@@ -146,10 +148,10 @@ void int_cmt0() {
     if(V_r < 0) gpio_set_level(GPIO_NUM_18, 0);
     else gpio_set_level(GPIO_NUM_18, 1);
     
-    
 
-    Duty_r = fabs(V_r) / 4.2;
-    Duty_l = fabs(V_l) / 4.2;
+    Duty_r = (fabs(V_r)+0.25) / 4.2;
+    Duty_l = (fabs(V_l)+0.25) / 4.2;
+    // Duty_l = (fabs(V_l))*1.2 / 4.2;
 
     // Duty_r = 0.19999999/2.1;
     // Duty_l = 0.19999999/2.1;
@@ -474,6 +476,9 @@ void int_cmt2(void)
 
         // printf(" speed_r: %f, speed_l: %f, speed: %f\n", speed_r, speed_l, speed);  
         // ESP_LOGE(TAG, "speed_r: %f, speed_l: %f, speed: %f", speed_r, speed_l, speed);
+        // printf("%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
+        // ESP_LOGE(TAG, "%f, %f, %f, %f, %f\n", tar_speed, speed, len_mouse, V_r, V_l);
+        // ESP_LOGI(TAG, "diff_r=%d, diff_l=%d, spd_r=%f, spd_l=%f", diff_pulse_r, diff_pulse_l, speed_new_r, speed_new_l);
 
         // 積分項（飽和あり）
         I_speed += speed;
@@ -486,14 +491,13 @@ void int_cmt2(void)
         // 総移動距離（左右の新速度の平均を足す）
         len_mouse += (speed_new_r + speed_new_l) / 2.0;
 
-        ESP_LOGE(TAG, "len_mouse: %f", len_mouse);
+        // ESP_LOGE(TAG, "len_mouse: %f", len_mouse);
 
         // 次回差分計算用に保持
         before_locate_r = locate_r;
         before_locate_l = locate_l;
 
-        printf("\x1b[2J");
-        printf("\x1b[0;0H");
+        state = true; // Move to the next state
 
 
     /*****************************************************************************************
@@ -523,5 +527,9 @@ void int_cmt2(void)
 
         // 角度の更新（度単位）
         degree += (2.0 * (gyro_x_new - gyro_ref) / 32767.0);
+        ESP_LOGE(TAG, "dgree: %f", degree);
     }    
+
+    // printf("\x1b[2J");
+    // printf("\x1b[0;0H");
 }

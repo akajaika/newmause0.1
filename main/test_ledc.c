@@ -61,5 +61,4 @@ void update_duty(int duty_r8, int duty_l8) {
 
     ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty_l8);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-    printf("duty_r8: %d, duty_l8: %d\n", duty_r8, duty_l8);
 }
