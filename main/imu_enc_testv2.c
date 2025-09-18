@@ -48,6 +48,8 @@ float angle1 = 0.0f, angle2 = 0.0f; // MA732 エンコーダ角度（度単位�
 bool imu_flag = false;
 bool enc_flag = false;
 
+int count = 0;
+
 // -----------------------------------------------------------------------------
 // SPI バス初期化：SPI2_HOST (MPU6500)、SPI3_HOST (MA732×2)
 // -----------------------------------------------------------------------------
@@ -204,6 +206,22 @@ void MPU6500_init(void)
     trans.length    = 8;
     trans.tx_buffer = &send_data_mpu;
     trans.rx_buffer = recv_data_mpu;
+
+
+    //ゼロ値補正入れてもいいかも
+    // void gyro_get_ref(void){
+    //     long i = 0;
+    //     float gyro_ref_temp = 0;
+    //     gyro_ref = 0;
+    //     //ジャイロのリファレンス取得
+    //     for(i = 0; i < 2500; i++){
+    //         gyro_ref_temp += (float)gyro_x_new;
+    //         wait_ms(1);
+    //     }
+    //     gyro_ref = (gyro_ref_temp/2500.0);
+    //     degree = 0;
+    //     wait_ms(100);
+    // }
 }
 
 // -----------------------------------------------------------------------------
@@ -232,9 +250,9 @@ void MPU6500_read_accel_gyro(void)
     ay = (raw_data[2] << 8) | raw_data[3];
     az = (raw_data[4] << 8) | raw_data[5];
 
-    gx = (raw_data[8] << 8) | raw_data[9];
+    gz = (raw_data[8] << 8) | raw_data[9];
     gy = (raw_data[10] << 8) | raw_data[11];
-    gz = (raw_data[12] << 8) | raw_data[13];
+    gx = (raw_data[12] << 8) | raw_data[13];
 
     imu_ag.ax_f = (2*(float)ax / 4096.0f);
     imu_ag.ay_f = (2*(float)ay / 4096.0f);
@@ -243,8 +261,15 @@ void MPU6500_read_accel_gyro(void)
     imu_ag.gy_f = (2000.0*(float)gy / 32767.0f)*3.1415/180.0;    
     imu_ag.gz_f = (2000.0*(float)gz / 32767.0f)*3.1415/180.0;
 
-    // ESP_LOGI(TAG_MPU, "Accel: X=%d Y=%d Z=%d", ax, ay, az);
-    // ESP_LOGI(TAG_MPU, "Gyro : X=%d Y=%d Z=%d", gx, gy, gz);
+    // if(count == 10){
+    //     // ESP_LOGI(TAG_MPU, "Accel: X=%d Y=%d Z=%d", ax, ay, az);
+    //     ESP_LOGI(TAG_MPU, "Gyro :Z=%f",imu_ag.gz_f);
+    //     printf("\x1b[2J");
+    //     printf("\x1b[0;0H");
+    //     count = 0;
+    // }else{
+    //     count++;
+    // }
 }
 
 // -----------------------------------------------------------------------------

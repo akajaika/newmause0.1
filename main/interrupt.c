@@ -35,6 +35,8 @@ int degree_l = 0;
 int as = 1;
 float duty_r,duty_l = 1.0;
 
+int count_LOGE = 0;
+
 void int_cmt0() {
     if (run_mode == STRAIGHT_MODE) {
         // Handle straight mode interrupt
@@ -511,7 +513,7 @@ void int_cmt2(void)
 
         // ローパスフィルタ適用前の値取得
         gyro_x_new = imu_ag.gx_f;
-        gyro_x = (gyro_x_new - gyro_ref);
+        gyro_x = (gyro_x_new);
 
         // 角速度の更新
         p_ang_vel = ang_vel;
@@ -522,12 +524,21 @@ void int_cmt2(void)
         if (I_ang_vel > 30 * 10000000000) {
             I_ang_vel = 30 * 10000000000;
         } else if (I_ang_vel < -1 * 10000000000) {
-            I_ang_vel = -1 * 10000000000;
+                I_ang_vel = -1 * 10000000000;
         }
 
         // 角度の更新（度単位）
-        degree += (2.0 * (gyro_x_new - gyro_ref) / 32767.0);
-        ESP_LOGE(TAG, "dgree: %f", degree);
+        degree += (gyro_x_new + 0.02) * 180 / PI / 100.0;
+
+        if(count_LOGE == 10){
+            // ESP_LOGI(TAG_MPU, "Accel: X=%d Y=%d Z=%d", ax, ay, az);
+            ESP_LOGE(TAG, "gyro_x_new: %f, dgree: %f", gyro_x_new, degree);
+            printf("\x1b[2J");
+            printf("\x1b[0;0H");
+            count_LOGE = 0;
+        }else{
+            count_LOGE++;
+        }
     }    
 
     // printf("\x1b[2J");
