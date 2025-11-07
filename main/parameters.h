@@ -3,7 +3,7 @@
 #include "static_parameters.h"
 
 //物�?�?なパラメータ
-#define TIRE_DIAMETER	(13.7)				//タイヤの直�?	[mm]
+#define TIRE_DIAMETER	(14.7)				//タイヤの直�?	[mm]
 #define TIRE_RADIUS	(TIRE_DIAMETER/2.0)		//タイヤの半�?	[mm]
 #define MMPP 		(TIRE_DIAMETER*PI)/(ENC_RES_MAX)	//エンコーダ1パルスあたりに進む距離[mm](TIRE_DIAMETER*PI)/(ENC_MAX)
 #define ENC_RES_MAX	(16383)
@@ -34,13 +34,16 @@
 //Iゲイン　最後に調整する	積�??値が合�?ようにする程度�?
 //Dゲイン　二番目に調整する�?	P制御によって発生した振動を抑えられる程度に調整
 //車体中�?における並進方向速度に関するフィードバ�?クゲイン
-#define SPEED_KP	(6.1)				//Pゲイン
+#define SPEED_KP	(0.25)				//Pゲイン
 #define SPEED_KI	(0.0)				//Iゲイン
 #define SPEED_KD	(0.0)				//Dゲイン　
 //車体中�?における回転方向速度に関するフィードバ�?クゲイン
 #define OMEGA_KP	(1.0)				//Pゲイン
 #define OMEGA_KI	(0.0)				//Iゲイン
 #define OMEGA_KD	(0.0)				//Dゲイン
+
+#define BALANCE_GAIN_P    (3.0)               // Straight Balance control gain
+#define BALANCE_GAIN_D    (1.5)               // Straight Balance control gain
 
 //走行パラメータ
 #define SEARCH_SPEED	(0.3)				//探索走行�?�速度	[m/s]

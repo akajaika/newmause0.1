@@ -33,7 +33,7 @@ void setup_cmt_timer() {
         NULL, ESP_INTR_FLAG_IRAM, NULL
     );
 
-    xTaskCreatePinnedToCore(cmt_task, "cmt_task", 4096, NULL, 10, &cmt_task_handle, 0);
+    xTaskCreatePinnedToCore(cmt_task, "cmt_task", 4096, NULL, 10, &cmt_task_handle, 1);
 
     timer_start(TIMER_GROUP_0, TIMER_0);
     printf("Doing setup_cmt_timer2\n");

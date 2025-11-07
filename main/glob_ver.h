@@ -46,6 +46,8 @@ GLOBAL float speed_old_l;     // 左車輪前回速度 [m/s]
 GLOBAL float speed_new_l;     // 左車輪瞬時速度 [m/s]
 GLOBAL float speed;           // 車体前進速度（平均） [m/s]
 GLOBAL float p_speed;         // 前回の車体速度 [m/s]
+GLOBAL float p_speed_r;       // 前回の右車輪速度 [m/s]
+GLOBAL float p_speed_l;       // 前回の左車輪速度 [m/s]
 GLOBAL float tar_speed;       // 目標速度 [m/s]
 GLOBAL float end_speed;       // 終了速度 [m/s]
 GLOBAL float V_r;             // 右モータ指令電圧 [V]
@@ -136,3 +138,7 @@ GLOBAL unsigned char push_switch; // 押しボタン状態
 GLOBAL int next_nextdir;
 GLOBAL next_position next;
 GLOBAL bool sidewallcheck_flag;
+
+extern int test_duty_count;
+
+extern float dt;

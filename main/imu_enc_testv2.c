@@ -14,6 +14,8 @@
 #include "driver/i2c_master.h"
 #include "typedef.h"
 #include "MA732_read.h"
+#include "glob_ver.h"
+#include "esp_timer.h"
 
 // ログ用タグ
 #define TAG_MA732 "MA732"
@@ -28,9 +30,6 @@ spi_device_handle_t dev1_handle;  // MA732 右（CS = GPIO10）
 spi_device_handle_t dev2_handle;  // MA732 左（CS = GPIO8）
 spi_device_handle_t dev_handle;   // MPU6500 用（CS = GPIO37）
 
-// I2Cデバイスハンドル
-i2c_master_dev_handle_t PCA9533_handle;
-
 // SPI通信データ（MPU6500 用）
 uint8_t send_data_enc1 = 0x55;
 uint8_t send_data_enc2 = 0x55;
@@ -41,7 +40,8 @@ uint8_t recv_data_mpu[1];
 spi_transaction_t trans;
 
 uint16_t raw1, raw2; 
-int16_t ax, ay, az, gx, gy, gz;
+int16_t ax, ay, az, gx, gx_p, gy, gz;
+float gx_l = 0.0f;
 
 float angle1 = 0.0f, angle2 = 0.0f; // MA732 エンコーダ角度（度単位）
 
@@ -49,6 +49,12 @@ bool imu_flag = false;
 bool enc_flag = false;
 
 int count = 0;
+
+float imu_log[6][10000];
+
+float gyro_drift = 0.0f;
+
+static uint8_t rx_buf[16];
 
 // -----------------------------------------------------------------------------
 // SPI バス初期化：SPI2_HOST (MPU6500)、SPI3_HOST (MA732×2)
@@ -93,14 +99,15 @@ esp_err_t mpu6500_write_byte(uint8_t reg_addr, uint8_t data)
 // -----------------------------------------------------------------------------
 // MPU6500: 複数バイト読み出し関数
 // -----------------------------------------------------------------------------
-esp_err_t mpu6500_read_bytes(uint8_t reg_addr, int8_t *data, size_t len)
+esp_err_t mpu6500_read_bytes(uint8_t reg_addr, uint8_t *data, size_t len)
 {
     uint8_t tx = reg_addr | 0x80;  // MSB=1 で読み出し
     spi_transaction_t t = {
-        .length    = 8 * (1 + len),
+        .length    = 8 * (1 + len), // (1+len)の先頭1バイトはアドレス
         .tx_buffer = &tx,
         .rxlength  = 8 * (1 + len),
-        .rx_buffer = malloc(len + 1),
+        // .rx_buffer = malloc(len + 1),
+        .rx_buffer = rx_buf,
     };
     if (!t.rx_buffer) {
         return ESP_ERR_NO_MEM;
@@ -109,7 +116,7 @@ esp_err_t mpu6500_read_bytes(uint8_t reg_addr, int8_t *data, size_t len)
     if (ret == ESP_OK) {
         memcpy(data, ((int8_t*)t.rx_buffer) + 1, len);  // 先頭1バイトはダミー
     }
-    free(t.rx_buffer);
+    // free(t.rx_buffer);
     return ret;
 }
 
@@ -243,7 +250,7 @@ void MPU6500_configure(void)
 // -----------------------------------------------------------------------------
 void MPU6500_read_accel_gyro(void)
 {
-    int8_t raw_data[14];
+    uint8_t raw_data[14];
     mpu6500_read_bytes(0x3B, raw_data, 14);
 
     ax = (raw_data[0] << 8) | raw_data[1];
@@ -252,24 +259,56 @@ void MPU6500_read_accel_gyro(void)
 
     gz = (raw_data[8] << 8) | raw_data[9];
     gy = (raw_data[10] << 8) | raw_data[11];
-    gx = (raw_data[12] << 8) | raw_data[13];
+    gx = (int16_t)((raw_data[12] << 8) | raw_data[13]);
+    gx = gx - (int16_t)(gyro_drift); // ドリフト補正     
+    // if (gx > -1 && gx < 1) {
+    //     gx = 0;          
+    // }
+    // gx = gx*0.1 + gx_p*0.9;
+    // gx_p = gx;
+    // gx_l = gx_l + gx;
+    
+    
 
-    imu_ag.ax_f = (2*(float)ax / 4096.0f);
-    imu_ag.ay_f = (2*(float)ay / 4096.0f);
-    imu_ag.az_f = (2*(float)az / 4096.0f);
-    imu_ag.gx_f = (2000.0*(float)gx / 32767.0f)*3.1415/180.0;
-    imu_ag.gy_f = (2000.0*(float)gy / 32767.0f)*3.1415/180.0;    
-    imu_ag.gz_f = (2000.0*(float)gz / 32767.0f)*3.1415/180.0;
+    imu_ag.ax_f = ((float)ax / 4096.0f);
+    imu_ag.ay_f = ((float)ay / 4096.0f);
+    imu_ag.az_f = ((float)az / 4096.0f);
+    imu_ag.gx_f = (2000.0*(float)gx / 32767.0f)*PI/180.0;
+    imu_ag.gy_f = (2000.0*(float)gy / 32767.0f)*PI/180.0;   
+    imu_ag.gz_f = (2000.0*(float)gz / 32767.0f)*PI/180.0;
+
+    if(motor.status == true){
+        count++;
+        // log[0][count] = (int16_t)(gx);
+        // log[1][count] = (float)(gx_l);
+        // log[2][count] = (float)(degree);
+
+        imu_log[0][count] = (float)(speed);
+        imu_log[1][count] = (float)(speed_r);
+        imu_log[2][count] = (float)(speed_new_r);
+        imu_log[3][count] = (float)(V_r);
+        imu_log[4][count] = (float)(tar_speed);
+        imu_log[5][count] = (float)(dt);
+    }
 
     // if(count == 10){
     //     // ESP_LOGI(TAG_MPU, "Accel: X=%d Y=%d Z=%d", ax, ay, az);
-    //     ESP_LOGI(TAG_MPU, "Gyro :Z=%f",imu_ag.gz_f);
+    // ESP_LOGI(TAG_MPU, "Gyro , dgree := %d %f %f",gx,gx_l,degree);
     //     printf("\x1b[2J");
     //     printf("\x1b[0;0H");
     //     count = 0;
     // }else{
     //     count++;
     // }
+}
+
+void MPU6500_read_log(void)
+{
+    printf("Gyro Integrated Degree Log:\n");
+    for (int i = 0; i < count; i++) {
+        ESP_LOGI(TAG_MPU, "Log: Gyro,Integrated,Degree %d %f %f %f %f %f %f", i, imu_log[0][i], imu_log[1][i], imu_log[2][i], imu_log[3][i], imu_log[4][i], imu_log[5][i]);
+        vTaskDelay(pdMS_TO_TICKS(5));
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -343,8 +382,21 @@ void init_imu(void)
 
     // 3) MPU6500 設定
     MPU6500_configure();
+
+    int64_t t0 = esp_timer_get_time(); // μs
+    float gx_sum = 0;
+    int count_drift = 0;
+
+    while (esp_timer_get_time() - t0 < 4000000) { // 4秒間データ取得
+        MPU6500_read_accel_gyro();
+        gx_sum += gx;
+        count_drift++;
+    }
+
+    gyro_drift = (float)gx_sum / (float)count_drift;
     
     // DMA を使わないシンプルな最初の読み出し
     ESP_ERROR_CHECK(spi_device_polling_transmit(dev_handle, &trans));
+    ESP_LOGI(TAG_MPU, "IMU drift: %f", gyro_drift);
     ESP_LOGI(TAG_MPU, "IMU: 0x%02X", recv_data_mpu[0]);
 }

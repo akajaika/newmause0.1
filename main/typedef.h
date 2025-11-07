@@ -112,6 +112,8 @@ typedef struct
 extern bool enc_flag;
 extern bool imu_flag;
 
+extern float local_degree;
+
 
 #define _MYTYPEDEF
 

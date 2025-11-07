@@ -2,6 +2,7 @@ extern void init_imu(void);
 extern void MA732_read(void);
 extern void MPU6500_read_accel_gyro(void);
 extern void imu(void);
+extern void MPU6500_read_log(void);
 
 // -----------------------------------------------------------------------------
 // MA732GQ-Z: raw14 (0 ～ 16383) → 0.0 ～ 360.0° に変換

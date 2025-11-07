@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "hello_world",
-    "project_version":    "1",
+    "project_version":    "129a5b4-dirty",
     "project_path":       "C:/Users/akaja/hello_world/hello_world",
     "idf_path":           "C:/Users/akaja/esp/v5.2.2/esp-idf",
     "build_dir":          "C:/Users/akaja/hello_world/hello_world/build",
@@ -805,7 +805,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "C:/Users/akaja/hello_world/hello_world/build/esp-idf/main/libmain.a",
-            "sources": [ "C:/Users/akaja/hello_world/hello_world/main/test_ledc.c", "C:/Users/akaja/hello_world/hello_world/main/adc.c", "C:/Users/akaja/hello_world/hello_world/main/cmt_timer.c", "C:/Users/akaja/hello_world/hello_world/main/cmt_task.c", "C:/Users/akaja/hello_world/hello_world/main/glob_ver.c", "C:/Users/akaja/hello_world/hello_world/main/interrupt.c", "C:/Users/akaja/hello_world/hello_world/main/straight_test.c", "C:/Users/akaja/hello_world/hello_world/main/moter_test.c", "C:/Users/akaja/hello_world/hello_world/main/imu_enc_testv2.c" ],
+            "sources": [ "C:/Users/akaja/hello_world/hello_world/main/led_dr.c", "C:/Users/akaja/hello_world/hello_world/main/test_ledc.c", "C:/Users/akaja/hello_world/hello_world/main/adc.c", "C:/Users/akaja/hello_world/hello_world/main/cmt_timer.c", "C:/Users/akaja/hello_world/hello_world/main/cmt_task.c", "C:/Users/akaja/hello_world/hello_world/main/glob_ver.c", "C:/Users/akaja/hello_world/hello_world/main/interrupt.c", "C:/Users/akaja/hello_world/hello_world/main/straight_test.c", "C:/Users/akaja/hello_world/hello_world/main/moter_test.c", "C:/Users/akaja/hello_world/hello_world/main/imu_enc_testv2.c" ],
             "include_dirs": []
         },
         "mbedtls": {

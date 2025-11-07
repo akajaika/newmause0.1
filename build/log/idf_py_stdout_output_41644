@@ -1,10 +1,8 @@
 -- ccache will be used for faster recompilation
--- git rev-parse returned 'fatal: not a git repository (or any of the parent directories): .git'
--- Could not use 'git describe' to determine PROJECT_VER.
 -- Building ESP-IDF components for target esp32s3
 -- Project sdkconfig file C:/Users/akaja/hello_world/hello_world/sdkconfig
 -- Compiler supported targets: xtensa-esp-elf
--- App "hello_world" version: 1
+-- App "hello_world" version: 129a5b4-dirty
 -- Adding linker script C:/Users/akaja/hello_world/hello_world/build/esp-idf/esp_system/ld/memory.ld
 -- Adding linker script C:/Users/akaja/hello_world/hello_world/build/esp-idf/esp_system/ld/sections.ld.in
 -- Adding linker script C:/Users/akaja/esp/v5.2.2/esp-idf/components/esp_rom/esp32s3/ld/esp32s3.rom.ld

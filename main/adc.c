@@ -52,7 +52,7 @@ void setup_adc() {
         },
         {
             .atten = 11,
-            .channel = 5,
+            .channel = 5,   
             .unit = 0,
             .bit_width = 12
         }
@@ -82,6 +82,8 @@ void gpio_setup() {
     gpio_set_direction(GPIO_NUM_7, GPIO_MODE_OUTPUT);
     gpio_set_direction(GPIO_NUM_9, GPIO_MODE_OUTPUT);
     gpio_set_direction(GPIO_NUM_14, GPIO_MODE_OUTPUT);
+
+    gpio_set_direction(GPIO_NUM_15, GPIO_MODE_OUTPUT);
 }
 
 int adc_read(int num) {

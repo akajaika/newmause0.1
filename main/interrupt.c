@@ -18,6 +18,8 @@
 #include "esp_log.h"
 #include "esp_err.h"
 #include "test_ledc.h"
+#include "esp_timer.h"
+
 
 static const char *TAG = "ADC";
 
@@ -37,11 +39,14 @@ float duty_r,duty_l = 1.0;
 
 int count_LOGE = 0;
 
+static int64_t last_time = 0;
+
+int test_duty_count = 700;
+
 void int_cmt0() {
     if (run_mode == STRAIGHT_MODE) {
         // Handle straight mode interrupt
-        // Add your specific logic here
-        // tar_speed += accel / 1000; 
+        // Add your specific logic here 
         tar_speed += accel / 1000;
         if (tar_speed > max_speed) {
             // ESP_LOGI(TAG, "tar_speed: %f, max_speed: %f", tar_speed, max_speed);
@@ -69,11 +74,52 @@ void int_cmt0() {
             if (tar_degree < max_degree) {
                 tar_degree = max_degree;
             }
-            if (tar_ang_vel < -max_ang_vel) {
-                tar_ang_vel = -max_ang_vel;
+            if (tar_ang_vel < max_ang_vel) {
+                tar_ang_vel = max_ang_vel;
             }
         }
     }
+
+    // if(run_mode == STRAIGHT_MODE){
+	// 	if(con_wall.enable == true && sen_fr.value + sen_fl.value <= (TH_SEN_FR+TH_SEN_FL)*5 )		//?????????????????`?F?b?N
+	// 	{
+			
+	// 		con_wall.p_error = con_wall.error;	//???????????
+			
+			
+	// 		//???E??Z???T???A??????g????????????????`?F?b?N????A?p????????????v?Z
+	// 		if( ( sen_r.is_control == true ) && ( sen_l.is_control == true ) )
+	// 		{									//????????L?????????????????v?Z
+	// 			con_wall.error = sen_r.error - sen_l.error;
+	// 		}
+	// 		else								//?Е??????????????Z???T?????????????????????v?Z
+	// 		{
+	// 			con_wall.error = 2.0 * (sen_r.error - sen_l.error);	//?Е??????g?p????????2?{????
+	// 		}
+			
+			
+	// 		//DI????v?Z
+	// 		con_wall.diff = con_wall.error - con_wall.p_error;	//?????????l???v?Z
+	// 		con_wall.sum += con_wall.error;				//????????l???v?Z
+			
+	// 		if(con_wall.sum > con_wall.sum_max)			//????????l????l???
+	// 		{
+	// 			con_wall.sum = con_wall.sum_max;
+	// 		}
+	// 		else if(con_wall.sum < (-con_wall.sum_max))		//????????l????l???
+	// 		{
+	// 			con_wall.sum = -con_wall.sum_max;
+	// 		}
+
+	// 		con_wall.p_omega = con_wall.omega;
+	// 		con_wall.omega = con_wall.kp * con_wall.error * 0.5 + con_wall.p_omega * 0.5;	//??????W?p???x[rad/s]???v?Z
+	// 		tar_ang_vel = con_wall.omega;
+	// 	}else{
+	// 		tar_ang_vel = 0;
+	// 	}
+		
+	// }
+
 
     I_tar_speed += tar_speed;
 	if(I_tar_speed >30*10000000000){
@@ -92,11 +138,11 @@ void int_cmt0() {
     
     if (run_mode == STRAIGHT_MODE || run_mode == TURN_MODE) {
         //PID speed
-        V_r += (tar_speed - speed/10) * SPEED_KP;
-        V_l += (tar_speed - speed/10) * SPEED_KP;
+        // V_r += (tar_speed - speed) * SPEED_KP;
+        // V_l += (tar_speed - speed) * SPEED_KP;
         
-        // V_r += (tar_speed) * SPEED_KP;
-        // V_l += (tar_speed) * SPEED_KP;
+        V_r += (tar_speed) * SPEED_KP;
+        V_l += (tar_speed) * SPEED_KP;
 
         // printf("Doing1 intrrept r %f\n", V_r);
         // printf("Doing1 intrrept l %f\n", V_l);
@@ -109,50 +155,84 @@ void int_cmt0() {
 
         // V_r -= (p_speed - speed) * SPEED_KD;
         // V_l -= (p_speed - speed) * SPEED_KD;
+        
+        // Straight Balance control
+        if (run_mode == STRAIGHT_MODE)
+        {
+            V_r -= (speed_r - speed_l) * BALANCE_GAIN_P;
+            V_l -= (speed_l - speed_r) * BALANCE_GAIN_P;
+
+            // V_r += (p_speed_r - speed_r) * BALANCE_GAIN_D;
+            // V_l += (p_speed_l - speed_l) * BALANCE_GAIN_D;
+        }
 
         // printf("Doing3 intrrept r %f\n", V_r);
         // printf("Doing3 intrrept l %f\n", V_l);
         //PID omega
         // V_r += (tar_ang_vel - ang_vel) * OMEGA_KP;
         // V_l -= (tar_ang_vel - ang_vel) * OMEGA_KP;
-        V_r += (tar_ang_vel) * OMEGA_KP;
-        V_l -= (tar_ang_vel) * OMEGA_KP;
+
+        // V_r += (tar_ang_vel) * OMEGA_KP;
+        // V_l -= (tar_ang_vel) * OMEGA_KP;
 
         // V_r += (I_tar_ang_vel - I_ang_vel) * OMEGA_KI;
         // V_l -= (I_tar_ang_vel - I_ang_vel) * OMEGA_KI;
 
         // V_r -= (p_ang_vel - ang_vel) * OMEGA_KD;
         // V_l += (p_ang_vel - ang_vel) * OMEGA_KD;
-    
+
+        // if (run_mode == TURN_MODE)
+        // {
+        //     V_r -= (speed_r - (-speed_l)) * BALANCE_GAIN_P;
+        //     V_l -= (speed_l - (-speed_r)) * BALANCE_GAIN_P;
+
+        //     // V_r += (p_speed_r - (-speed_r)) * BALANCE_GAIN_D;
+        //     // V_l += (p_speed_l - (-speed_l)) * BALANCE_GAIN_D;
+        // }
+        
     }
 
-    if(V_r > 3.3) {
-        V_r = 3.3; // Limit to max voltage
+    if(V_r > 2.0) {
+        V_r = 2.0; // Limit to max voltage
         // printf("Limit to max voltage\n");
     } 
-    if(V_l > 3.3) {
-        V_l = 3.3; // Limit to max voltage
+    if(V_l > 2.0) {
+        V_l = 2.0; // Limit to max voltage
     }
 
-    // if(V_r > 3.3 || V_r < -0.01) {
-    //     V_r = 0.01; // Limit to max voltage
-    //     // printf("Limit to max voltage\n");
-    // } 
-    // if(V_l > 3.3 || V_l < -0.01) {
-    //     V_l = 0.01; // Limit to max voltage
-    // }
+    // if(V_l < 0) gpio_set_level(GPIO_NUM_33, 1);
+    // else gpio_set_level(GPIO_NUM_33, 0);    
+    // if(V_r < 0) gpio_set_level(GPIO_NUM_18, 0);
+    // else gpio_set_level(GPIO_NUM_18, 1);
 
 
     // printf("Doing intrrept V_bat %f\n", V_bat);
+    // if(run_mode == TURN_MODE){
+    //     // if(TURN_DIR == LEFT){
+    //     //     if(V_l < 0) gpio_set_level(GPIO_NUM_33, 1);
+    //     //     else V_l = 0;
+    //     //     if(V_r < 0) V_r = 0; 
+    //     //     else gpio_set_level(GPIO_NUM_18, 1);
+    //     // }else if(TURN_DIR == RIGHT){    
+    //     //     if(V_l < 0) V_l = 0; 
+    //     //     else gpio_set_level(GPIO_NUM_33, 0);    
+    //     //     if(V_r < 0) gpio_set_level(GPIO_NUM_18, 0);
+    //     //     else V_r = 0;
+    //     // }
+    // }else{
+    //     if(V_l < 0){ V_l = 0;}; 
+    //     if(V_r < 0){ V_r = 0;};
+    //     // if(V_l < 0){ V_l = 0;printf("latest");}; 
+    //     // if(V_r < 0){ V_r = 0;printf("latest");};
+    // }
 
-    if(V_l < 0) gpio_set_level(GPIO_NUM_33, 1);
-    else gpio_set_level(GPIO_NUM_33, 0);    
-    if(V_r < 0) gpio_set_level(GPIO_NUM_18, 0);
-    else gpio_set_level(GPIO_NUM_18, 1);
-    
+    // Duty_r = (fabs(V_r)+0.25) / 4.2;
+    // Duty_l = (fabs(V_l)+0.25) / 4.2;
+    Duty_r = (V_r) / (V_bat*2);
+    Duty_l = (V_l) / (V_bat*2);
 
-    Duty_r = (fabs(V_r)+0.25) / 4.2;
-    Duty_l = (fabs(V_l)+0.25) / 4.2;
+    // Duty_r = (fabs(V_r)+0.25) / V_bat;
+    // Duty_l = (fabs(V_l)+0.25) / V_bat;
     // Duty_l = (fabs(V_l))*1.2 / 4.2;
 
     // Duty_r = 0.19999999/2.1;
@@ -160,11 +240,24 @@ void int_cmt0() {
 
     // printf("Doing intrrept Duty_r %f\n", Duty_r);
 
-	motor.motor_r.duty =(short)(1023.0 * Duty_r);
-	motor.motor_l.duty =(short)(1023.0 * Duty_l);
+	motor.motor_r.duty =((short)(953.0 * Duty_r) + 60);
+	motor.motor_l.duty =((short)(953.0 * Duty_l) + 60);
 
     // motor.motor_r.duty =150;
 	// motor.motor_l.duty =800;
+
+    
+    // if (test_duty_count < 1000.0){
+    //     if (motor.status == true){
+    //         test_duty_count++;
+    //         // update_duty(test_duty_count/10, test_duty_count/10);
+    //         update_duty(80, 80);
+    //     }
+    // }else{
+    //     update_duty(0, 0);
+    //     test_duty_count = 1000001.0;
+    // }
+
 
     if(motor.status == true) {
         // printf("If motors are enabled, apply the duty cycle\n\n");
@@ -186,6 +279,10 @@ void int_cmt0() {
 
     timer++;
 	cnt++;
+
+    int64_t now = esp_timer_get_time(); 
+    dt = (now - last_time) / 1000000.0f;
+    last_time = now;
 }
 
 void int_cmt1(void)
@@ -397,12 +494,35 @@ void int_cmt1(void)
             state = 2;
 			break;
 	}
+
+            // if(count_LOGE == 10){
+        //     // ESP_LOGI(TAG_MPU, "Accel: X=%d Y=%d Z=%d", ax, ay, az);
+        //     ESP_LOGE(TAG, "gyro_x_new: %f, dgree: %f", gyro_x_new, degree);
+        //     ESP_LOGE(TAG, "gyro_x_new: %f, dgree: %f", gyro_x_new, degree);
+        //     ESP_LOGE(TAG, "len_mouse: %f", len_mouse);
+        //     printf("\x1b[2J");
+        //     printf("\x1b[0;0H");
+        //     count_LOGE = 0;
+        // }else{
+        //     count_LOGE++;
+        // }
+
+    // V_bat = ((float)adc_read(4) * ((2400.0 + 620.0) / 620.0)); // Read battery voltage
+    V_bat = ((float)adc_read(4)) / 4095.0 * 1.1 * (2400.0 + 620.0) / 620.0; // Read battery voltage
+    V_bat = V_bat-0.06; // Convert to volts
+    V_bat = V_bat * ((V_bat/4.2)*(V_bat/4.2)); // キャリブレーション
+    V_bat = V_bat +0.1; // キャリブレーション
+    // ESP_LOGE(TAG, "V_bat: %f", V_bat);
+    // printf("\x1b[2J");
+    // printf("\x1b[0;0H");
 	
-	// state++;		//4つの状態で切り替え
-	// if(state > 3)
-	// {
-	// 	state = 0;
-	// }
+	state++;		//4つの状態で切り替え
+	if(state > 3)
+	{
+		state = 0;
+	}
+
+
 }
 
 void int_cmt2(void)
@@ -416,7 +536,6 @@ void int_cmt2(void)
         値を取得 → 角度更新 → 速度計算
     *****************************************************************************************/    
         // MA732_read();// エンコーダ角度読み取り
-        enc_flag = true;// Set encoder flag
 
         enc_data_r = angle2;
         enc_data_l = angle1;
@@ -472,6 +591,8 @@ void int_cmt2(void)
         speed_l = speed_new_l * 0.1 + speed_old_l * 0.9;
 
         p_speed = speed;
+        p_speed_r = speed_r;
+        p_speed_l = speed_l;
 
         // 全体速度（左右の平均）
         speed = (speed_r + speed_l) / 2.0;
@@ -509,7 +630,6 @@ void int_cmt2(void)
     if (state == 1) {
         // ジャイロ値更新
         // MPU6500_read_accel_gyro();
-        imu_flag = true; // Set IMU flag
 
         // ローパスフィルタ適用前の値取得
         gyro_x_new = imu_ag.gx_f;
@@ -527,18 +647,28 @@ void int_cmt2(void)
                 I_ang_vel = -1 * 10000000000;
         }
 
-        // 角度の更新（度単位）
-        degree += (gyro_x_new + 0.02) * 180 / PI / 100.0;
+        int64_t now = esp_timer_get_time(); // μs
+        float dt = (now - last_time) / 1000000.0f;
+        last_time = now;
 
-        if(count_LOGE == 10){
-            // ESP_LOGI(TAG_MPU, "Accel: X=%d Y=%d Z=%d", ax, ay, az);
-            ESP_LOGE(TAG, "gyro_x_new: %f, dgree: %f", gyro_x_new, degree);
-            printf("\x1b[2J");
-            printf("\x1b[0;0H");
-            count_LOGE = 0;
-        }else{
-            count_LOGE++;
-        }
+        // 角度の更新（度単位）
+        // degree += (gyro_x_new + 0.02) * 360 / PI / 100.0;
+        degree += ((gyro_x_new)*(180.0 / PI) * dt); // Convert to degrees
+
+
+        // ESP_LOGE(TAG, "dgree: %f", degree);
+
+        // if(count_LOGE == 10){
+        //     // ESP_LOGI(TAG_MPU, "Accel: X=%d Y=%d Z=%d", ax, ay, az);
+            // ESP_LOGE(TAG, "gyro_x_new: %f, dgree: %f", gyro_x_new, degree);
+        //     ESP_LOGE(TAG, "gyro_x_new: %f, dgree: %f", gyro_x_new, degree);
+        //     ESP_LOGE(TAG, "len_mouse: %f", len_mouse);
+        //     printf("\x1b[2J");
+        //     printf("\x1b[0;0H");
+        //     count_LOGE = 0;
+        // }else{
+        //     count_LOGE++;
+        // }
     }    
 
     // printf("\x1b[2J");

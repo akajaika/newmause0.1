@@ -15,7 +15,6 @@
 #include "driver/mcpwm_oper.h"
 #include "driver/mcpwm_gen.h"
 #include "driver/mcpwm_cmpr.h"
-#include "driver/gpio.h"
 #include "parameters.h"
 #include "glob_ver.h"
 #include "static_parameters.h"
@@ -40,7 +39,7 @@ esp_err_t e;
 
 mcpwm_timer_handle_t m_timer = NULL;
 mcpwm_oper_handle_t oper = NULL;
-mcpwm_gen_handle_t gen_r,gen_l = NULL;
+mcpwm_gen_handle_t gen_r = NULL, gen_l = NULL;
 
 void setup_motor(){
 
@@ -169,7 +168,7 @@ void setup_motor(){
     ESP_LOGI("MOTOR", "setup_motor completebefore2");
 
     mcpwm_generator_set_actions_on_compare_event(gen_r,gen_cmpr_action_r,MCPWM_GEN_COMPARE_EVENT_ACTION_END());
-    mcpwm_generator_set_actions_on_compare_event(gen_l,gen_cmpr_action_l,MCPWM_GEN_COMPARE_EVENT_ACTION_END() );
+    mcpwm_generator_set_actions_on_compare_event(gen_l,gen_cmpr_action_l,MCPWM_GEN_COMPARE_EVENT_ACTION_END());
 
     ESP_LOGI("MOTOR", "setup_motor completebefore2");
 
