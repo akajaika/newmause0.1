@@ -138,11 +138,11 @@ void int_cmt0() {
     
     if (run_mode == STRAIGHT_MODE || run_mode == TURN_MODE) {
         //PID speed
-        // V_r += (tar_speed - speed) * SPEED_KP;
-        // V_l += (tar_speed - speed) * SPEED_KP;
+        V_r += (tar_speed - speed/15.0) * SPEED_KP;
+        V_l += (tar_speed - speed/15.0) * SPEED_KP;
         
-        V_r += (tar_speed) * SPEED_KP;
-        V_l += (tar_speed) * SPEED_KP;
+        // V_r += (tar_speed) * SPEED_KP;
+        // V_l += (tar_speed) * SPEED_KP;
 
         // printf("Doing1 intrrept r %f\n", V_r);
         // printf("Doing1 intrrept l %f\n", V_l);

@@ -34,7 +34,7 @@
 //Iゲイン　最後に調整する	積�??値が合�?ようにする程度�?
 //Dゲイン　二番目に調整する�?	P制御によって発生した振動を抑えられる程度に調整
 //車体中�?における並進方向速度に関するフィードバ�?クゲイン
-#define SPEED_KP	(0.25)				//Pゲイン
+#define SPEED_KP	(4.0)				//Pゲイン
 #define SPEED_KI	(0.0)				//Iゲイン
 #define SPEED_KD	(0.0)				//Dゲイン　
 //車体中�?における回転方向速度に関するフィードバ�?クゲイン
@@ -42,7 +42,7 @@
 #define OMEGA_KI	(0.0)				//Iゲイン
 #define OMEGA_KD	(0.0)				//Dゲイン
 
-#define BALANCE_GAIN_P    (3.0)               // Straight Balance control gain
+#define BALANCE_GAIN_P    (2.0)               // Straight Balance control gain
 #define BALANCE_GAIN_D    (1.5)               // Straight Balance control gain
 
 //走行パラメータ

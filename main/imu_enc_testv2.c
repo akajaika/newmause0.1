@@ -283,7 +283,7 @@ void MPU6500_read_accel_gyro(void)
         // log[1][count] = (float)(gx_l);
         // log[2][count] = (float)(degree);
 
-        imu_log[0][count] = (float)(speed);
+        imu_log[0][count] = (float)(speed/15.0);
         imu_log[1][count] = (float)(speed_r);
         imu_log[2][count] = (float)(speed_new_r);
         imu_log[3][count] = (float)(V_r);
